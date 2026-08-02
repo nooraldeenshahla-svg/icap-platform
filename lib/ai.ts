@@ -51,6 +51,13 @@ The JSON object MUST match this exact shape:
 }
 
 Respond in the same language the input data is written in (Arabic input → Arabic output).
+
+IMPORTANT — depth requirements:
+- "recommendations" MUST contain AT LEAST 7 distinct, concrete, actionable recommendations, each addressing a DIFFERENT dimension of the conflict: legal/property rights, social reconciliation and dialogue, economic/livelihoods, security, local governance and institutional capacity, tribal/customary mediation, and psychosocial support. Do not repeat the same idea twice. Each recommendation's "description" should be specific enough to act on (who does what, roughly how), not a generic slogan.
+- "peaceOpportunities" MUST contain AT LEAST 4 distinct entries, each naming real categories of actors relevant to the Iraqi context (tribal elders, civil-society/reconciliation committees, local government, security services, religious leaders, women's and youth groups) and a concrete opening for engagement.
+- "earlyWarningIndicators" MUST contain AT LEAST 5 distinct, observable indicators.
+- Ground every recommendation and opportunity in the specific facts of the conflict record provided — never generic boilerplate that could apply to any conflict.
+
 Return ONLY the JSON object, nothing else.`;
 
 interface GroqResponse {
@@ -66,6 +73,7 @@ export async function analyzeConflictWithAI(
   const payload = {
     model: GROQ_MODEL,
     temperature: 0.4,
+    max_tokens: 6000,
     response_format: { type: "json_object" },
     messages: [
       { role: "system", content: SYSTEM_INSTRUCTION },

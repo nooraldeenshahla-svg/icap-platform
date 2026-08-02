@@ -25,7 +25,7 @@ export default function LoginPage() {
         </button>
 
         <p className="mt-6 text-xs text-muted-foreground">
-          بياناتك (النزاعات اللي تسجّلها) تُحفظ محلياً على جهازك فقط، ولا تُشارك مع أي شخص آخر.
+          بياناتك (النزاعات اللي تسجّلها) محفوظة بحسابك أنت بس، ولا يشوفها أي حساب Google ثاني.
         </p>
       </div>
     </div>

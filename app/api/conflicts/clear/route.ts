@@ -7,8 +7,9 @@ export const runtime = "nodejs";
 
 export async function POST() {
   const session = await getServerSession(authOptions);
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session?.user?.email) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  await prisma.conflict.deleteMany({});
+  // Only clears the signed-in account's own conflicts — never other users' data.
+  await prisma.conflict.deleteMany({ where: { createdBy: session.user.email } });
   return NextResponse.json({ ok: true });
 }

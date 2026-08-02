@@ -6,30 +6,45 @@ import type { Conflict } from "@/types/conflict";
 
 export const runtime = "nodejs";
 
+/**
+ * Every conflict is scoped to the Google account that created it — each
+ * signed-in user only ever sees, updates, or deletes their own records.
+ * (Data still lives in one shared Postgres database; the isolation is
+ * enforced here, per request, by filtering on the account's email.)
+ */
+
 export async function GET() {
   const session = await getServerSession(authOptions);
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session?.user?.email) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const rows = await prisma.conflict.findMany({ orderBy: { updatedAt: "desc" } });
+  const rows = await prisma.conflict.findMany({
+    where: { createdBy: session.user.email },
+    orderBy: { updatedAt: "desc" },
+  });
   return NextResponse.json(rows.map((r) => r.data));
 }
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session?.user?.email) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const conflict = (await req.json()) as Conflict;
   if (!conflict?.id || !conflict?.name) {
     return NextResponse.json({ error: "Invalid conflict payload" }, { status: 400 });
   }
 
-  // Preserve the original creator on updates; stamp it in on first save.
   const existing = await prisma.conflict.findUnique({ where: { id: conflict.id } });
+
+  // Block editing a record that belongs to a different account.
+  if (existing && existing.createdBy !== session.user.email) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
   const existingData = existing?.data as unknown as Conflict | undefined;
   const enriched: Conflict = {
     ...conflict,
-    createdByName: existingData?.createdByName ?? session.user?.name ?? undefined,
-    createdByEmail: existingData?.createdByEmail ?? session.user?.email ?? undefined,
+    createdByName: existingData?.createdByName ?? session.user.name ?? undefined,
+    createdByEmail: existingData?.createdByEmail ?? session.user.email,
   };
 
   await prisma.conflict.upsert({
@@ -40,8 +55,8 @@ export async function POST(req: NextRequest) {
       governorate: conflict.location?.governorate ?? "",
       conflictType: conflict.conflictType,
       status: conflict.status,
-      createdBy: session.user?.email ?? undefined,
-      createdByName: session.user?.name ?? undefined,
+      createdBy: session.user.email,
+      createdByName: session.user.name ?? undefined,
       data: enriched as unknown as object,
     },
     update: {
