@@ -1,0 +1,26 @@
+// ICAP shared database schema — Neon (PostgreSQL), free tier.
+// The full Conflict object (as defined in types/conflict.ts) is stored as
+// JSON in `data`. A few fields are duplicated as plain columns so they can
+// be filtered/sorted at the database level later without touching the JSON.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Conflict {
+  id             String   @id
+  name           String
+  governorate    String
+  conflictType   String
+  status         String
+  createdBy      String?
+  createdByName  String?
+  data           Json
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}

@@ -1,0 +1,130 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Neutral canvas — warm limestone, not cold white */
+    --background: 36 28% 97%;
+    --foreground: 200 25% 12%;
+
+    --card: 36 30% 99%;
+    --card-foreground: 200 25% 12%;
+
+    --popover: 36 30% 99%;
+    --popover-foreground: 200 25% 12%;
+
+    /* Primary — Euphrates teal, the platform's signature */
+    --primary: 174 47% 27%;
+    --primary-foreground: 40 40% 98%;
+
+    /* Secondary — sun-baked clay */
+    --secondary: 27 45% 47%;
+    --secondary-foreground: 40 40% 98%;
+
+    --muted: 36 18% 92%;
+    --muted-foreground: 200 12% 40%;
+
+    --accent: 27 55% 92%;
+    --accent-foreground: 27 60% 25%;
+
+    --destructive: 4 72% 45%;
+    --destructive-foreground: 40 40% 98%;
+
+    --border: 36 18% 87%;
+    --input: 36 18% 87%;
+    --ring: 174 47% 27%;
+
+    /* Semantic risk scale — used consistently across dashboard, maps, reports */
+    --risk-low: 152 45% 38%;
+    --risk-medium: 42 85% 50%;
+    --risk-high: 22 85% 52%;
+    --risk-critical: 4 72% 45%;
+
+    --radius: 0.625rem;
+
+    --font-display: "Fraunces", "Noto Serif", serif;
+    --font-body: "Inter", "Noto Sans", sans-serif;
+    --font-arabic: "Noto Kufi Arabic", "Cairo", sans-serif;
+    --font-mono: "IBM Plex Mono", monospace;
+  }
+
+  .dark {
+    --background: 200 30% 8%;
+    --foreground: 40 20% 94%;
+
+    --card: 200 26% 11%;
+    --card-foreground: 40 20% 94%;
+
+    --popover: 200 26% 11%;
+    --popover-foreground: 40 20% 94%;
+
+    --primary: 174 45% 48%;
+    --primary-foreground: 200 30% 8%;
+
+    --secondary: 27 50% 55%;
+    --secondary-foreground: 200 30% 8%;
+
+    --muted: 200 20% 16%;
+    --muted-foreground: 40 10% 65%;
+
+    --accent: 200 20% 18%;
+    --accent-foreground: 27 60% 75%;
+
+    --destructive: 4 70% 55%;
+    --destructive-foreground: 40 20% 94%;
+
+    --border: 200 18% 20%;
+    --input: 200 18% 20%;
+    --ring: 174 45% 48%;
+
+    --risk-low: 152 40% 48%;
+    --risk-medium: 42 80% 58%;
+    --risk-high: 22 80% 58%;
+    --risk-critical: 4 70% 58%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-body antialiased;
+  }
+
+  html[dir="rtl"] body {
+    @apply font-arabic;
+  }
+
+  h1, h2, h3, h4 {
+    @apply font-display;
+  }
+
+  html[dir="rtl"] h1,
+  html[dir="rtl"] h2,
+  html[dir="rtl"] h3,
+  html[dir="rtl"] h4 {
+    @apply font-arabic;
+  }
+}
+
+@layer utilities {
+  .rtl-flip {
+    transform: scaleX(-1);
+  }
+  html[dir="rtl"] .rtl-flip {
+    transform: scaleX(1);
+  }
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: white !important;
+  }
+  .print-page {
+    padding: 0 !important;
+  }
+}
