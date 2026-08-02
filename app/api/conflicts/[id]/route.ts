@@ -5,10 +5,11 @@ import { prisma } from "@/lib/prisma";
 
 export const runtime = "nodejs";
 
-export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  await prisma.conflict.delete({ where: { id: params.id } }).catch(() => null);
+  const { id } = await params;
+  await prisma.conflict.delete({ where: { id } }).catch(() => null);
   return NextResponse.json({ ok: true });
 }
