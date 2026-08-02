@@ -42,7 +42,7 @@ function AnalysisContent() {
       if (wizardConflictId && all.some((c) => c.id === wizardConflictId)) {
         setSelectedId(wizardConflictId);
       } else if (all.length > 0) {
-        setSelectedId(all[0].id);
+        setSelectedId(all[0]?.id ?? "");
       }
     });
   }, [wizardConflictId]);

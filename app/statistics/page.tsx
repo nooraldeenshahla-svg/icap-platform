@@ -86,7 +86,7 @@ export default function StatisticsPage() {
   const riskColors: Record<string, string> = { low: "#2f7d72", medium: "#cc8748", high: "#d9822b", critical: "#b93b2f", none: "#8a8a8a" };
   const riskData: ChartData<"bar"> = {
     labels: Object.keys(byRisk).map((k) => t.riskLabels[k as keyof typeof t.riskLabels]),
-    datasets: [{ data: Object.values(byRisk), backgroundColor: Object.keys(byRisk).map((k) => riskColors[k]), borderRadius: 6 }],
+    datasets: [{ data: Object.values(byRisk), backgroundColor: Object.keys(byRisk).map((k) => riskColors[k] ?? "#8a8a8a"), borderRadius: 6 }],
   };
 
   return (

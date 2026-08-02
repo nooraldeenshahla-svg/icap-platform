@@ -37,7 +37,7 @@ export default function ReportsPage() {
   React.useEffect(() => {
     getAllConflicts().then((all) => {
       setConflicts(all);
-      if (all.length > 0) setSelectedId(all[0].id);
+      if (all.length > 0) setSelectedId(all[0]?.id ?? "");
     });
   }, []);
 
