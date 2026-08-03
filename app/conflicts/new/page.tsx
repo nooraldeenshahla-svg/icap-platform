@@ -119,7 +119,6 @@ export default function NewConflictPage() {
         effects: [],
         onionModels: [],
         actionPlan: [],
-        actionPlan: [],
         status: "draft",
         createdAt: now,
         updatedAt: now,
