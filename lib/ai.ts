@@ -56,9 +56,26 @@ IMPORTANT — depth requirements:
 - "recommendations" MUST contain AT LEAST 7 distinct, concrete, actionable recommendations, each addressing a DIFFERENT dimension of the conflict: legal/property rights, social reconciliation and dialogue, economic/livelihoods, security, local governance and institutional capacity, tribal/customary mediation, and psychosocial support. Do not repeat the same idea twice. Each recommendation's "description" should be specific enough to act on (who does what, roughly how), not a generic slogan.
 - "peaceOpportunities" MUST contain AT LEAST 4 distinct entries, each naming real categories of actors relevant to the Iraqi context (tribal elders, civil-society/reconciliation committees, local government, security services, religious leaders, women's and youth groups) and a concrete opening for engagement.
 - "earlyWarningIndicators" MUST contain AT LEAST 5 distinct, observable indicators.
+- "scenarios" MUST contain EXACTLY 3 entries — one "best_case", one "most_likely", one "worst_case". Each entry's "title" and "narrative" MUST be different from the other two entries AND different from each other within the same entry (never copy the conflict's name as the title, never repeat the narrative as the title). "probability" is an INTEGER from 0 to 100 (e.g. 60, never 0.6), and the three probabilities should sum to roughly 100.
 - Ground every recommendation and opportunity in the specific facts of the conflict record provided — never generic boilerplate that could apply to any conflict.
 
 Return ONLY the JSON object, nothing else.`;
+
+function normalizeResult(raw: AIAnalysisResult): AIAnalysisResult {
+  const scenarios = (raw.scenarios ?? []).map((s) => ({
+    ...s,
+    probability: s.probability <= 1 ? Math.round(s.probability * 100) : Math.round(s.probability),
+  }));
+  return { ...raw, scenarios };
+}
+
+function isSufficient(result: AIAnalysisResult): boolean {
+  return (
+    (result.recommendations?.length ?? 0) >= 5 &&
+    (result.scenarios?.length ?? 0) >= 3 &&
+    new Set(result.scenarios?.map((s) => s.narrative)).size >= 3
+  );
+}
 
 interface GroqResponse {
   choices?: Array<{ message?: { content?: string } }>;
@@ -70,47 +87,59 @@ export async function analyzeConflictWithAI(
 ): Promise<AIAnalysisResult> {
   const apiKey = getApiKey();
 
-  const payload = {
-    model: GROQ_MODEL,
-    temperature: 0.4,
-    max_tokens: 6000,
-    response_format: { type: "json_object" },
-    messages: [
-      { role: "system", content: SYSTEM_INSTRUCTION },
-      {
-        role: "user",
-        content: `Analyze the following conflict record and return ONLY the JSON object described in your instructions:\n\n${JSON.stringify(
-          conflict,
-          null,
-          2
-        )}`,
+  async function callOnce(extraReminder?: string): Promise<AIAnalysisResult> {
+    const userContent = `Analyze the following conflict record and return ONLY the JSON object described in your instructions:\n\n${JSON.stringify(
+      conflict,
+      null,
+      2
+    )}${extraReminder ? `\n\n${extraReminder}` : ""}`;
+
+    const payload = {
+      model: GROQ_MODEL,
+      temperature: 0.5,
+      max_tokens: 6000,
+      response_format: { type: "json_object" },
+      messages: [
+        { role: "system", content: SYSTEM_INSTRUCTION },
+        { role: "user", content: userContent },
+      ],
+    };
+
+    const res = await fetch(GROQ_ENDPOINT, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
       },
-    ],
-  };
+      body: JSON.stringify(payload),
+    });
 
-  const res = await fetch(GROQ_ENDPOINT, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify(payload),
-  });
+    const data = (await res.json()) as GroqResponse;
 
-  const data = (await res.json()) as GroqResponse;
+    if (!res.ok) {
+      throw new Error(`Groq API error (${res.status}): ${data.error?.message ?? "Unknown error"}`);
+    }
 
-  if (!res.ok) {
-    throw new Error(`Groq API error (${res.status}): ${data.error?.message ?? "Unknown error"}`);
+    const text = data.choices?.[0]?.message?.content;
+    if (!text) {
+      throw new Error("Groq returned an empty response.");
+    }
+
+    try {
+      return normalizeResult(JSON.parse(text) as AIAnalysisResult);
+    } catch {
+      throw new Error("Groq did not return valid JSON. Raw response logged server-side.");
+    }
   }
 
-  const text = data.choices?.[0]?.message?.content;
-  if (!text) {
-    throw new Error("Groq returned an empty response.");
-  }
+  const first = await callOnce();
+  if (isSufficient(first)) return first;
 
-  try {
-    return JSON.parse(text) as AIAnalysisResult;
-  } catch {
-    throw new Error("Groq did not return valid JSON. Raw response logged server-side.");
-  }
+  // The first pass was too thin (missing recommendations, or scenarios were
+  // duplicated/generic) — ask once more with a pointed reminder.
+  const second = await callOnce(
+    "Your previous answer was too thin or repetitive. This time: write at least 7 genuinely different recommendations, " +
+      "and make sure the three scenarios (best_case, most_likely, worst_case) each have a distinct, specific title and narrative — do not reuse text between them."
+  );
+  return isSufficient(second) ? second : first.recommendations?.length ? first : second;
 }

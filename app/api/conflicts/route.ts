@@ -5,6 +5,8 @@ import { prisma } from "@/lib/prisma";
 import type { Conflict } from "@/types/conflict";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store";
 
 /**
  * Every conflict is scoped to the Google account that created it — each
@@ -21,7 +23,9 @@ export async function GET() {
     where: { createdBy: session.user.email },
     orderBy: { updatedAt: "desc" },
   });
-  return NextResponse.json(rows.map((r) => r.data));
+  return NextResponse.json(rows.map((r) => r.data), {
+    headers: { "Cache-Control": "no-store, no-cache, must-revalidate" },
+  });
 }
 
 export async function POST(req: NextRequest) {

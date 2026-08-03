@@ -21,7 +21,7 @@ export async function saveConflict(conflict: Conflict): Promise<void> {
 }
 
 export async function getAllConflicts(): Promise<Conflict[]> {
-  const res = await fetch("/api/conflicts");
+  const res = await fetch("/api/conflicts", { cache: "no-store" });
   if (!res.ok) return [];
   return res.json();
 }
