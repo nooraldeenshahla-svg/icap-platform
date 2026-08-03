@@ -113,6 +113,8 @@ export async function suggestGoalPhrasing(text: string, locale: "ar" | "en" = "a
   if (!suggestion) throw new Error("Groq returned an empty response.");
   return suggestion;
 }
+
+export async function analyzeConflictWithAI(
   conflict: Partial<Conflict>
 ): Promise<AIAnalysisResult> {
   const apiKey = getApiKey();
