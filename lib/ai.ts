@@ -82,7 +82,37 @@ interface GroqResponse {
   error?: { message?: string };
 }
 
-export async function analyzeConflictWithAI(
+export async function suggestGoalPhrasing(text: string, locale: "ar" | "en" = "ar"): Promise<string> {
+  const apiKey = getApiKey();
+
+  const systemPrompt = locale === "ar"
+    ? `أنت خبير بصياغة أهداف مشاريع بناء السلام وحل النزاعات بالسياق العراقي. مهمتك تحسين صياغة هدف مكتوب بشكل عادي وتحويله لصياغة احترافية بأسلوب "SMART" (محدد، قابل للقياس، قابل للتحقيق، مرتبط بالواقع، ومحدد بإطار زمني عام). أرجع فقط النص المُحسَّن، جملة أو جملتين كحد أقصى، بدون أي شرح أو مقدمة أو علامات تنصيص.`
+    : `You are an expert in peacebuilding and conflict-resolution project design. Improve the wording of a plainly-written goal into a professional SMART-style objective (specific, measurable, achievable, relevant, time-bound framing). Return ONLY the improved text, one or two sentences maximum, no explanation, no quotation marks.`;
+
+  const payload = {
+    model: GROQ_MODEL,
+    temperature: 0.5,
+    max_tokens: 200,
+    messages: [
+      { role: "system", content: systemPrompt },
+      { role: "user", content: text },
+    ],
+  };
+
+  const res = await fetch(GROQ_ENDPOINT, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
+    body: JSON.stringify(payload),
+  });
+
+  const data = (await res.json()) as GroqResponse;
+  if (!res.ok) {
+    throw new Error(`Groq API error (${res.status}): ${data.error?.message ?? "Unknown error"}`);
+  }
+  const suggestion = data.choices?.[0]?.message?.content?.trim();
+  if (!suggestion) throw new Error("Groq returned an empty response.");
+  return suggestion;
+}
   conflict: Partial<Conflict>
 ): Promise<AIAnalysisResult> {
   const apiKey = getApiKey();

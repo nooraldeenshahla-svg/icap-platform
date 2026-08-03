@@ -3,6 +3,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { LocaleShell } from "@/components/locale-shell";
 import { AuthProvider } from "@/components/auth/session-provider";
+import { Footer } from "@/components/layout/footer";
 
 export const metadata: Metadata = {
   title: {
@@ -10,7 +11,7 @@ export const metadata: Metadata = {
     template: "%s | ICAP",
   },
   description:
-    "Iraq Conflict Analysis Platform — an AI-powered platform for analyzing community conflicts, stakeholders, root causes, and peace opportunities across Iraq.",
+    "Iraq Conflict Analysis Platform — developed by the Peace Organization for Peaceful Coexistence. An AI-powered platform for analyzing community conflicts, stakeholders, root causes, and peace opportunities across Iraq.",
   manifest: "/manifest.json",
   icons: { icon: "/icon.svg" },
 };
@@ -28,7 +29,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <AuthProvider>
-            <LocaleShell>{children}</LocaleShell>
+            <LocaleShell>
+              {children}
+              <Footer />
+            </LocaleShell>
           </AuthProvider>
         </ThemeProvider>
       </body>

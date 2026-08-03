@@ -237,6 +237,7 @@ export interface Conflict {
   onionModels: OnionModelEntry[];
   abcTriangle?: ABCTriangle;
   problemTree?: { nodes: ProblemTreeNode[] };
+  actionPlan: ActionItem[];
 
   aiAnalysis?: AIAnalysisResult;
   aiAnalyzedAt?: string;
@@ -248,6 +249,19 @@ export interface Conflict {
   /** Who created this record — filled in server-side from the signed-in Google account. */
   createdByName?: string;
   createdByEmail?: string;
+}
+
+export type ActionItemStatus = "planned" | "in_progress" | "completed" | "delayed";
+
+export interface ActionItem {
+  id: string;
+  conflictId: string;
+  goal: string;
+  activity: string;
+  startDate: string;
+  endDate: string;
+  responsible?: string;
+  status: ActionItemStatus;
 }
 
 export const IRAQ_GOVERNORATES = [

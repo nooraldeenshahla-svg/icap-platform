@@ -5,7 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import {
   Network, GitBranch, Clock, Layers, Triangle, Map as MapIcon,
-  FileBarChart, ShieldAlert, BookOpen, ArrowLeft, ArrowRight, Plus,
+  FileBarChart, ShieldAlert, BookOpen, ArrowLeft, ArrowRight, Plus, ListChecks,
 } from "lucide-react";
 import { Navbar } from "@/components/layout/navbar";
 import { TributaryMotif } from "@/components/layout/tributary-motif";
@@ -50,6 +50,7 @@ const MODULES = [
   { href: "/stakeholders", icon: Network, ar: "أصحاب المصلحة", en: "Stakeholders", ar_d: "شبكة تفاعلية للنفوذ والمصالح والعلاقات", en_d: "Interactive network of influence, interests, and relationships" },
   { href: "/problem-tree", icon: GitBranch, ar: "شجرة المشكلة", en: "Problem Tree", ar_d: "من الجذور إلى المشكلة الأساسية إلى النتائج", en_d: "From root causes to core problem to consequences" },
   { href: "/timeline", icon: Clock, ar: "الخط الزمني", en: "Timeline", ar_d: "تتبّع تصاعد الأحداث لحظة بلحظة", en_d: "Track escalation event by event" },
+  { href: "/action-plan", icon: ListChecks, ar: "خطة الحل", en: "Resolution Plan", ar_d: "أهداف ونشاطات بجدول زمني ومسؤوليات واضحة", en_d: "Goals and activities with a timeline and clear ownership" },
   { href: "/analysis?model=onion", icon: Layers, ar: "نموذج البصلة", en: "Onion Model", ar_d: "الموقف، المصلحة، الحاجة لكل طرف", en_d: "Position, interest, and need for every actor" },
   { href: "/analysis?model=abc", icon: Triangle, ar: "مثلث ABC", en: "ABC Triangle", ar_d: "المواقف والسلوكيات والتناقضات", en_d: "Attitudes, behaviors, and contradictions" },
   { href: "/dashboard#map", icon: MapIcon, ar: "خريطة العراق التفاعلية", en: "Iraq Map", ar_d: "تجميع النزاعات جغرافياً مع مرشّحات متقدمة", en_d: "Geo-clustered conflicts with advanced filters" },

@@ -118,6 +118,8 @@ export default function NewConflictPage() {
         causes: [],
         effects: [],
         onionModels: [],
+        actionPlan: [],
+        actionPlan: [],
         status: "draft",
         createdAt: now,
         updatedAt: now,

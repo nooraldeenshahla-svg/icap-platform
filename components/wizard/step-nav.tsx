@@ -20,6 +20,7 @@ export const WIZARD_STEPS: WizardStep[] = [
   { key: "onion", ar: "نموذج البصلة", en: "Onion Model", href: (id) => `/analysis?conflict=${id}&model=onion` },
   { key: "abc", ar: "مثلث ABC", en: "ABC Triangle", href: (id) => `/analysis?conflict=${id}&model=abc` },
   { key: "ai", ar: "التحليل بالذكاء الاصطناعي", en: "AI Analysis", href: (id) => `/analysis?conflict=${id}&model=risk` },
+  { key: "action-plan", ar: "خطة الحل", en: "Resolution Plan", href: (id) => `/action-plan?conflict=${id}` },
 ];
 
 const COPY = {

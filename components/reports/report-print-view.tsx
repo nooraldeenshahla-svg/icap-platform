@@ -110,6 +110,19 @@ export function ReportPrintView({ conflict, locale }: { conflict: Conflict; loca
           )}
         </Section>
       )}
+
+      {conflict.actionPlan?.length > 0 && (
+        <Section title={isAr ? "خطة الحل" : "Resolution Plan"}>
+          <ul className="list-disc space-y-2 ps-5">
+            {conflict.actionPlan.map((item) => (
+              <li key={item.id}>
+                <b>{item.goal}</b> — {item.activity} ({formatDate(item.startDate, locale)} → {formatDate(item.endDate, locale)}
+                {item.responsible ? `, ${item.responsible}` : ""})
+              </li>
+            ))}
+          </ul>
+        </Section>
+      )}
     </div>
   );
 }

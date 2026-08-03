@@ -157,6 +157,14 @@ export async function generateConflictDocx(conflict: Conflict, locale: "ar" | "e
     }
   }
 
+  if (conflict.actionPlan?.length) {
+    children.push(H(isAr ? "خطة الحل" : "Resolution Plan"));
+    conflict.actionPlan.forEach((item) => {
+      children.push(P(item.goal, { bold: true }));
+      children.push(Bullet(`${item.activity} — ${item.startDate} → ${item.endDate}${item.responsible ? ` (${item.responsible})` : ""}`));
+    });
+  }
+
   const doc = new Document({
     sections: [{
       properties: { page: { size: { width: 11906, height: 16838 }, margin: { top: 1080, bottom: 1080, left: 1080, right: 1080 } } },
